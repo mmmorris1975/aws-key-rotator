@@ -1,8 +1,12 @@
 package main
 
 import (
+	"flag"
 	"fmt"
+	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/defaults"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/iam"
 	"github.com/go-ini/ini"
 	"io/ioutil"
 	"log"
@@ -19,6 +23,20 @@ const (
 	CRED_EXP_FILE_PREFIX     = ".aws_credentials_expiration"
 )
 
+var (
+	verbose bool
+)
+
+func init() {
+	flag.BoolVar(&verbose, "verbose", false, "print verbose messages")
+}
+
+func logDebug(msg string, args ...interface{}) {
+	if verbose {
+		log.Printf("DEBUG "+msg, args...)
+	}
+}
+
 func resolveProfile() *string {
 	// Check AWS_PROFILE, AWS_DEFAULT_PROFILE env vars, use "default" as default
 	profile := "default"
@@ -31,6 +49,7 @@ func resolveProfile() *string {
 		return &p
 	}
 
+	logDebug("PROFILE: %s", profile)
 	return &profile
 }
 
@@ -42,6 +61,7 @@ func resolveConfFile() *string {
 		conf_file = f
 	}
 
+	logDebug("CONFIG FILE: %s", conf_file)
 	return &conf_file
 }
 
@@ -53,6 +73,7 @@ func resolveCredFile() *string {
 		cred_file = f
 	}
 
+	logDebug("CREDENTIALS FILE: %s", cred_file)
 	return &cred_file
 }
 
@@ -84,6 +105,7 @@ func getCredDuration(profile *string) *time.Duration {
 		}
 	}
 
+	logDebug("DURATION: %s", duration.String())
 	return &duration
 }
 
@@ -104,7 +126,59 @@ func getCredExpiration(profile *string) time.Time {
 	return time.Unix(num, 0)
 }
 
-func setCredExpiration(profile *string) {
+func openLockFile(file string) (*os.File, error) {
+	f, err := os.OpenFile(file, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0600)
+	if err != nil {
+		return nil, err
+	}
+
+	return f, nil
+}
+
+func fetchAccessKeys(profile *string) (*iam.AccessKey, error) {
+	input := iam.ListAccessKeysInput{}
+	sess := session.Must(session.NewSessionWithOptions(session.Options{
+		SharedConfigState:       session.SharedConfigEnable,
+		Profile:                 *profile,
+		AssumeRoleTokenProvider: stscreds.StdinTokenProvider,
+	}))
+
+	svc := iam.New(sess)
+	truncated := true
+	for truncated {
+		res, err := svc.ListAccessKeys(&input)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, k := range (*res).AccessKeyMetadata {
+			key := k.AccessKeyId
+			if strings.EqualFold(*k.Status, "Inactive") {
+				logDebug("Deleting key %s\n", *key)
+				svc.DeleteAccessKey(&iam.DeleteAccessKeyInput{AccessKeyId: key})
+
+			} else {
+				logDebug("Inactivating key %s\n", *key)
+				status := "Inactive"
+				svc.UpdateAccessKey(&iam.UpdateAccessKeyInput{AccessKeyId: key, Status: &status})
+			}
+		}
+
+		truncated = *res.IsTruncated
+		if truncated {
+			input.Marker = res.Marker
+		}
+	}
+
+	res, err := svc.CreateAccessKey(&iam.CreateAccessKeyInput{})
+	if err != nil {
+		return nil, err
+	}
+
+	return (*res).AccessKey, nil
+}
+
+func rotateAccessKeys(profile *string) error {
 	// While not the best possible solution, this should allow us to ensure only one process is attempting
 	// to update the expiration file at a time.  If the "lock file" (the scratch file for writing the
 	// updated expriation time) exists, then just do nothing and return.  The 'defer' function should help
@@ -112,13 +186,10 @@ func setCredExpiration(profile *string) {
 	// the lock file
 	cf := resolveConfFile()
 	expFile := filepath.Join(filepath.Dir(*cf), fmt.Sprintf("%s_%s", CRED_EXP_FILE_PREFIX, *profile))
-	lockFile := fmt.Sprintf("%s.lock", expFile)
 
-	f, err := os.OpenFile(lockFile, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0600)
+	f, err := openLockFile(fmt.Sprintf("%s.lock", expFile))
 	if err != nil {
-		// just leave, someone else is probably updating the expiration time
-		// what if they aren't, and it's a dead lock file?
-		return
+		return nil
 	}
 
 	defer func(f *os.File, dest string) {
@@ -126,22 +197,41 @@ func setCredExpiration(profile *string) {
 		os.Rename(f.Name(), dest)
 	}(f, expFile)
 
-	newExp := time.Now().Add(*getCredDuration(profile)).Unix()
-	newExpStr := strconv.FormatInt(newExp, 10)
-
-	_, err = f.WriteString(newExpStr)
+	keys, err := fetchAccessKeys(profile)
 	if err != nil {
-		log.Printf("ERROR writing new expiration %+v", err)
+		return err
 	}
+	logDebug("KEYS: %+v", *keys)
+
+	credFile := resolveCredFile()
+	cfg, err := ini.Load(*credFile)
+	if err != nil {
+		return err
+	}
+
+	s, err := cfg.NewSection(*profile)
+	_, err = s.NewKey("aws_access_key_id", *keys.AccessKeyId)
+	_, err = s.NewKey("aws_secret_access_key", *keys.SecretAccessKey)
+	cfg.SaveTo(*credFile)
+
+	newExp := (*keys).CreateDate.Add(*getCredDuration(profile)).Unix()
+	_, err = f.WriteString(strconv.FormatInt(newExp, 10))
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func main() {
+	flag.Parse()
 	profile := resolveProfile()
-	credDuration := getCredDuration(profile)
 
-	log.Printf("PROFILE: %s", *profile)
-	log.Printf("CRED_DUR: %s", (*credDuration).String())
-	log.Printf("EXP: %+v", getCredExpiration(profile))
-
-	setCredExpiration(profile)
+	if getCredExpiration(profile).Before(time.Now()) {
+		log.Printf("!!! IT'S TIME TO ROTATE THE AWS KEYS FOR PROFILE: %s !!!", *profile)
+		err := rotateAccessKeys(profile)
+		if err != nil {
+			log.Fatalf("FATAL %+v\n", err)
+		}
+	}
 }
