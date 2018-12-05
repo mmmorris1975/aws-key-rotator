@@ -15,3 +15,9 @@
 
 # Go dep cache
 vendor/
+
+.idea/
+
+bin/
+pkg/
+src/*/vendor/
