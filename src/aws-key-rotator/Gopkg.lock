@@ -2,7 +2,7 @@
 
 
 [[projects]]
-  digest = "1:b6031f28897fac33d8c1cfeeb08cac5794ee4cf4d0f46c37d924845a2ba71ce7"
+  digest = "1:8ef263ab0d9984bf195b5b723c548b6a2277f7f9e92ebee0153b0cca40be1b27"
   name = "github.com/aws/aws-sdk-go"
   packages = [
     "aws",
@@ -14,13 +14,19 @@
     "aws/credentials",
     "aws/credentials/ec2rolecreds",
     "aws/credentials/endpointcreds",
+    "aws/credentials/processcreds",
     "aws/credentials/stscreds",
+    "aws/csm",
     "aws/defaults",
     "aws/ec2metadata",
     "aws/endpoints",
     "aws/request",
     "aws/session",
     "aws/signer/v4",
+    "internal/ini",
+    "internal/sdkio",
+    "internal/sdkrand",
+    "internal/sdkuri",
     "internal/shareddefaults",
     "private/protocol",
     "private/protocol/query",
@@ -31,24 +37,31 @@
     "service/sts",
   ]
   pruneopts = ""
-  revision = "5615d2ed566a09d326f681c789310a2e5ba5de5d"
-  version = "v1.10.50"
+  revision = "c4e0e593d5f18b478f17ff0e86b56d41a70ced2d"
+  version = "v1.16.2"
 
 [[projects]]
-  digest = "1:e26d0f8ccaf4087b93306d5e20e4816258116868ad6c6da0f2b4926c72fb92fa"
+  digest = "1:339861dc0a1379842150ee3c1e7aedbf1e32646b4643f32cc026b16ae8812b09"
   name = "github.com/go-ini/ini"
   packages = ["."]
   pruneopts = ""
-  revision = "20b96f641a5ea98f2f8619ff4f3e061cff4833bd"
-  version = "v1.28.2"
+  revision = "ffaaebdac6e54ce73b4e196b8406920921304ec9"
+  version = "v1.39.2"
 
 [[projects]]
-  digest = "1:e6f0b9e4dced4b6b5fedb810e2125a9f74dfe2ef1598c55ecb25e8b3d8f514ea"
+  digest = "1:13fe471d0ed891e8544eddfeeb0471fd3c9f2015609a1c000aefdedf52a19d40"
   name = "github.com/jmespath/go-jmespath"
   packages = ["."]
   pruneopts = ""
-  revision = "3433f3ea46d9f8019119e7dd41274e112a2359a9"
-  version = "0.2.2"
+  revision = "c2b33e84"
+
+[[projects]]
+  branch = "master"
+  digest = "1:520aff4e6299b31b3ff34f68677b3d1dba1eedbecd7444640907071e887e03e9"
+  name = "github.com/mmmorris1975/simple-logger"
+  packages = ["."]
+  pruneopts = ""
+  revision = "67eb5fee82c1ef8591ca51fb7e2f8cc6af57947f"
 
 [solve-meta]
   analyzer-name = "dep"
@@ -59,6 +72,7 @@
     "github.com/aws/aws-sdk-go/aws/session",
     "github.com/aws/aws-sdk-go/service/iam",
     "github.com/go-ini/ini",
+    "github.com/mmmorris1975/simple-logger",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
