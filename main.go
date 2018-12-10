@@ -1,4 +1,4 @@
-package aws_key_rotator
+package main
 
 import (
 	"flag"
