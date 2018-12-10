@@ -65,6 +65,7 @@
   ]
   pruneopts = ""
   revision = "78e6a89b828a8711268de23c8a77b470e348cb00"
+  version = "0.1.0"
 
 [[projects]]
   digest = "1:520aff4e6299b31b3ff34f68677b3d1dba1eedbecd7444640907071e887e03e9"
@@ -72,6 +73,7 @@
   packages = ["."]
   pruneopts = ""
   revision = "67eb5fee82c1ef8591ca51fb7e2f8cc6af57947f"
+  version = "0.1.0"
 
 [solve-meta]
   analyzer-name = "dep"
