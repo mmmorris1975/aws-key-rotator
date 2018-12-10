@@ -56,7 +56,17 @@
   revision = "c2b33e84"
 
 [[projects]]
-  branch = "master"
+  digest = "1:03afac4715a07001e375cdd13fb4f2374dac87308243d84f736248cef0044ed8"
+  name = "github.com/mmmorris1975/aws-config"
+  packages = [
+    ".",
+    "config",
+    "credentials",
+  ]
+  pruneopts = ""
+  revision = "42f4092b005262db131232d11c0052bbc8ae6345"
+
+[[projects]]
   digest = "1:520aff4e6299b31b3ff34f68677b3d1dba1eedbecd7444640907071e887e03e9"
   name = "github.com/mmmorris1975/simple-logger"
   packages = ["."]
@@ -71,7 +81,9 @@
     "github.com/aws/aws-sdk-go/aws/defaults",
     "github.com/aws/aws-sdk-go/aws/session",
     "github.com/aws/aws-sdk-go/service/iam",
-    "github.com/go-ini/ini",
+    "github.com/mmmorris1975/aws-config",
+    "github.com/mmmorris1975/aws-config/config",
+    "github.com/mmmorris1975/aws-config/credentials",
     "github.com/mmmorris1975/simple-logger",
   ]
   solver-name = "gps-cdcl"

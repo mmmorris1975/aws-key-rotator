@@ -1,0 +1,11 @@
+[default]
+aws_api_key_duration = 1h
+
+[profile no-prop]
+region = us-east-2
+
+[profile other]
+aws_api_key_duration = 8h
+
+[profile bad-value]
+aws_api_key_duration = ab

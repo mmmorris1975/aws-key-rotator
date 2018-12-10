@@ -26,9 +26,9 @@
   version = "1.16.2"
 
 [[constraint]]
-  name = "github.com/go-ini/ini"
-  version = "1.39.2"
-
-[[constraint]]
   name = "github.com/mmmorris1975/simple-logger"
   revision = "67eb5fee82c1ef8591ca51fb7e2f8cc6af57947f"
+
+[[constraint]]
+  name = "github.com/mmmorris1975/aws-config"
+  revision = "42f4092b005262db131232d11c0052bbc8ae6345"
