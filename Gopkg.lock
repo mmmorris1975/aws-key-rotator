@@ -56,7 +56,7 @@
   revision = "c2b33e84"
 
 [[projects]]
-  digest = "1:03afac4715a07001e375cdd13fb4f2374dac87308243d84f736248cef0044ed8"
+  digest = "1:133f6d83069a652510c5352ec80b3a9ff1d55707bc826aab887e63fd372777db"
   name = "github.com/mmmorris1975/aws-config"
   packages = [
     ".",
@@ -64,7 +64,7 @@
     "credentials",
   ]
   pruneopts = ""
-  revision = "42f4092b005262db131232d11c0052bbc8ae6345"
+  revision = "78e6a89b828a8711268de23c8a77b470e348cb00"
 
 [[projects]]
   digest = "1:520aff4e6299b31b3ff34f68677b3d1dba1eedbecd7444640907071e887e03e9"

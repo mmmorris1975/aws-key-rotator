@@ -89,12 +89,16 @@ func getCredDuration() time.Duration {
 		log.Warnf("profile not found, returning default credential duration (%s)", CredDurationDefault.String())
 		return duration
 	}
+	log.Debugf("PROFILE: %v", p.KeysHash())
 
 	if k, err := p.GetKey(CredDurationConfigKey); err == nil {
-		if duration, err = time.ParseDuration(k.Value()); err != nil {
+		duration, err = time.ParseDuration(k.Value())
+		if err != nil {
 			log.Warnf("invalid duration, returning default credential duration (%s)", CredDurationDefault.String())
 			return CredDurationDefault
 		}
+	} else {
+		log.Warnf("error getting credential duration property: %v", err)
 	}
 
 	log.Debugf("DURATION: %s", duration.String())
@@ -117,7 +121,7 @@ func rotateAccessKeys() error {
 		os.Rename(f.Name(), dest)
 	}(f, expFile())
 
-	keys, err := fetchAccessKeys(profile)
+	keys, err := fetchAccessKeys()
 	if err != nil {
 		return err
 	}
@@ -152,7 +156,7 @@ func openLockFile(file string) (*os.File, error) {
 	return f, nil
 }
 
-func fetchAccessKeys(profile string) (*iam.AccessKey, error) {
+func fetchAccessKeys() (*iam.AccessKey, error) {
 	input := iam.ListAccessKeysInput{}
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState:       session.SharedConfigEnable,
