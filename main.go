@@ -176,11 +176,22 @@ func fetchAccessKeys() (*iam.AccessKey, error) {
 			key := k.AccessKeyId
 			if strings.EqualFold(*k.Status, "Inactive") {
 				log.Debugf("Deleting key %s\n", *key)
-				svc.DeleteAccessKey(&iam.DeleteAccessKeyInput{AccessKeyId: key})
+				if _, err := svc.DeleteAccessKey(&iam.DeleteAccessKeyInput{AccessKeyId: key}); err != nil {
+					log.Warnf("error deleting access key: %v", err)
+				}
 			} else {
-				log.Debugf("Inactivating key %s\n", *key)
-				status := "Inactive"
-				svc.UpdateAccessKey(&iam.UpdateAccessKeyInput{AccessKeyId: key, Status: &status})
+				if delCreds {
+					log.Debugf("Deleting key %s\n", *key)
+					if _, err := svc.DeleteAccessKey(&iam.DeleteAccessKeyInput{AccessKeyId: key}); err != nil {
+						log.Warnf("error deleting access key: %v", err)
+					}
+				} else {
+					log.Debugf("Inactivating key %s\n", *key)
+					status := iam.StatusTypeInactive
+					if _, err := svc.UpdateAccessKey(&iam.UpdateAccessKeyInput{AccessKeyId: key, Status: &status}); err != nil {
+						log.Warnf("error inactivating access key: %v", err)
+					}
+				}
 			}
 		}
 
