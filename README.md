@@ -1,4 +1,6 @@
 # aws-key-rotator
+[![Go Report Card](https://goreportcard.com/badge/github.com/mmmorris1975/aws-key-rotator)](https://goreportcard.com/report/github.com/mmmorris1975/aws-key-rotator)
+
 A fairly opinionated tool to rotate static AWS API keys in the .aws/credentials file.  The goal of this
 utility is to provide a way to automate the rotation of the credentials after a configurable interval.
 (Where a facility like the bash shell PROMPT_COMMAND facility will automatically call this program to
