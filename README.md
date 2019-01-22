@@ -15,22 +15,21 @@ See the following for more information on AWS SDK configuration files:
 - https://boto3.readthedocs.io/en/latest/guide/quickstart.html#configuration
 - https://boto3.readthedocs.io/en/latest/guide/configuration.html#aws-config-file
 
-## Build Requirements
+## Installation
 
-Developed and tested using the go 1.9 tool chain, aws-sdk-go v1.10.50, and ini v1.28.2
-*NOTE* This project uses the (currently) experimental `dep` dependency manager.  See https://github.com/golang/dep for details.
-
-## Building and Installing
-
-Assuming you have a go workspace, and GOPATH environment variable set (https://golang.org/doc/code.html#Organization):
-  1. Run `go get -d github.com/mmmorris1975/aws-key-rotator`
-  2. Run `dep ensure` to check/retrieve dependencies
-  3. Then run `go build github.com/mmmorris1975/aws-key-rotator` to create the executable `aws-key-rotator` in the `$GOPATH/bin` directory
+Download the release of the tool appropriate for your platform (Windows, Linux, Mac) from the [release page](https://github.com/mmmorris1975/aws-key-rotator/releases),
+and install on your local system (preferably somewhere in your PATH); optionally renaming the file to something like `aws-key-rotator`.
+Since the downloaded file is a statically-compiled binary, there are no other dependencies required to run the tool.
 
 ## Usage
 
-The tool accepts only one command line flag, which is `-verbose`, to enable printing of verbose output to assist in tracking down any
-strange behavior in the application.  Aside from that, the tool is meant to run as a bare command configured via environment variables
+```text
+Usage of aws-key-rotator:
+  -delete
+    	delete credentials instead of inactivating
+  -verbose
+    	print verbose messages
+```
 
 ## Configuration
 
@@ -76,6 +75,16 @@ function do_prompt_command {
 PROMPT_COMMAND=do_prompt_command
 ```
   4. Re-source $HOME/.bashrc to enable the PROMPT_COMMAND logic (`source ~/.bashrc`)
+
+## Building
+
+Developed and tested using the go 1.11 tool chain, aws-sdk-go v1.16.23, and ini v1.39.2  
+*NOTE* This project uses the (currently) experimental `dep` dependency manager.  See https://github.com/golang/dep for details.
+
+Assuming you have a go workspace, and GOPATH environment variable set (https://golang.org/doc/code.html#Organization):
+  1. Run `go get -d github.com/mmmorris1975/aws-key-rotator`
+  2. Run `dep ensure` to check/retrieve dependencies
+  3. Then run `go build github.com/mmmorris1975/aws-key-rotator` to create the executable `aws-key-rotator` in the `$GOPATH/bin` directory
 
 ## Contributing
 
