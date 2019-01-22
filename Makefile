@@ -17,7 +17,7 @@ windows:
 	GOOS=$@ go build -o $(EXE)-$(VER)-$@.exe
 
 clean:
-	rm -f $(EXE) $(EXE)-*-*-*
+	rm -f $(EXE) $(EXE)-*-*
 
 test:
 	go test -v ./...
