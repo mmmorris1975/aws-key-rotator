@@ -2,7 +2,7 @@
 
 
 [[projects]]
-  digest = "1:8ef263ab0d9984bf195b5b723c548b6a2277f7f9e92ebee0153b0cca40be1b27"
+  digest = "1:5de8b766037cd7dd354619d268bff4cda72a16789343722fc55c9abd1ecd605a"
   name = "github.com/aws/aws-sdk-go"
   packages = [
     "aws",
@@ -37,8 +37,8 @@
     "service/sts",
   ]
   pruneopts = ""
-  revision = "c4e0e593d5f18b478f17ff0e86b56d41a70ced2d"
-  version = "v1.16.2"
+  revision = "c1afd6c3340feedd0a2c1cd929dcb291d4bd09ba"
+  version = "v1.16.23"
 
 [[projects]]
   digest = "1:339861dc0a1379842150ee3c1e7aedbf1e32646b4643f32cc026b16ae8812b09"
@@ -68,12 +68,12 @@
   version = "0.1.0"
 
 [[projects]]
-  digest = "1:520aff4e6299b31b3ff34f68677b3d1dba1eedbecd7444640907071e887e03e9"
+  digest = "1:eb82c0d0f7ce626bdb112c7281967703a20b44720dca7b0c4cb14464a2f708c9"
   name = "github.com/mmmorris1975/simple-logger"
   packages = ["."]
   pruneopts = ""
-  revision = "67eb5fee82c1ef8591ca51fb7e2f8cc6af57947f"
-  version = "0.1.0"
+  revision = "33e0d1c2f599dced1798688d187609b36f2bdb50"
+  version = "0.2.0"
 
 [solve-meta]
   analyzer-name = "dep"
