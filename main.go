@@ -24,15 +24,18 @@ const (
 )
 
 var (
+	Version  string
 	profile  string
 	verbose  bool
 	delCreds bool
+	version  bool
 	log      *simple_logger.Logger
 )
 
 func init() {
 	flag.BoolVar(&verbose, "verbose", false, "print verbose messages")
 	flag.BoolVar(&delCreds, "delete", false, "delete credentials instead of inactivating")
+	flag.BoolVar(&version, "version", false, "display program version")
 
 	log = simple_logger.StdLogger
 	log.SetLevel(simple_logger.INFO)
@@ -41,6 +44,10 @@ func init() {
 
 func main() {
 	flag.Parse()
+	if version {
+		fmt.Printf("VERSION: %s\n\n", Version)
+	}
+
 	if verbose {
 		log.SetLevel(simple_logger.DEBUG)
 	}

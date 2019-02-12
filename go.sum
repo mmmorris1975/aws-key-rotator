@@ -10,5 +10,7 @@ github.com/mmmorris1975/aws-config v0.2.3 h1:a9w5HtKnsPqe56/7Yfe2/UtDV+iYKjunoiL
 github.com/mmmorris1975/aws-config v0.2.3/go.mod h1:XxbXDEJRAhJLJdx/CjuucRHdkcsL6/DbuZc2I9PoLqM=
 github.com/mmmorris1975/aws-config v0.2.4 h1:cNyqrEDpq7AaP/WwMBJlws3hgkarxawq34cz5ntbDaM=
 github.com/mmmorris1975/aws-config v0.2.4/go.mod h1:XxbXDEJRAhJLJdx/CjuucRHdkcsL6/DbuZc2I9PoLqM=
+github.com/mmmorris1975/aws-config v0.2.5 h1:KTu/+lSQjepyPNRmf8l/jKzA04obUvAVuiWNPhVScmk=
+github.com/mmmorris1975/aws-config v0.2.5/go.mod h1:XxbXDEJRAhJLJdx/CjuucRHdkcsL6/DbuZc2I9PoLqM=
 github.com/mmmorris1975/simple-logger v0.3.0 h1:2zN9ilbh8Qy2fg3qmfGeGyoHSTgRXWL2Og7RuryFAuo=
 github.com/mmmorris1975/simple-logger v0.3.0/go.mod h1:or6zLAgsxJ9R30hrSwa2muJEfapfwWuTt1gxI3K7cUI=
