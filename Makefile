@@ -3,11 +3,8 @@ VER := $(shell git describe --tags)
 
 .PHONY: release clean test darwin linux windows
 
-$(EXE): Gopkg.lock *.go
+$(EXE): *.go
 	go build -v -i $@
-
-Gopkg.lock: Gopkg.toml
-	dep ensure
 
 release: $(EXE) darwin windows linux
 

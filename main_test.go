@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws/defaults"
-	"github.com/mmmorris1975/aws-config"
 	"github.com/mmmorris1975/aws-config/config"
 	"io/ioutil"
 	"os"
@@ -15,8 +14,8 @@ import (
 
 func TestGetCredDuration(t *testing.T) {
 	t.Run("bad-file-env", func(t *testing.T) {
-		os.Setenv(config.ConfFileEnvVar, "bad")
-		defer os.Unsetenv(config.ConfFileEnvVar)
+		os.Setenv(config.ConfigFileEnvVar, "bad")
+		defer os.Unsetenv(config.ConfigFileEnvVar)
 
 		profile = "p"
 		if getCredDuration() != CredDurationDefault {
@@ -26,8 +25,8 @@ func TestGetCredDuration(t *testing.T) {
 	})
 
 	t.Run("empty-profile", func(t *testing.T) {
-		os.Setenv(config.ConfFileEnvVar, testConfFile())
-		defer os.Unsetenv(config.ConfFileEnvVar)
+		os.Setenv(config.ConfigFileEnvVar, testConfFile())
+		defer os.Unsetenv(config.ConfigFileEnvVar)
 
 		profile = ""
 		if getCredDuration() != 1*time.Hour {
@@ -37,8 +36,8 @@ func TestGetCredDuration(t *testing.T) {
 	})
 
 	t.Run("explicit-default", func(t *testing.T) {
-		os.Setenv(config.ConfFileEnvVar, testConfFile())
-		defer os.Unsetenv(config.ConfFileEnvVar)
+		os.Setenv(config.ConfigFileEnvVar, testConfFile())
+		defer os.Unsetenv(config.ConfigFileEnvVar)
 
 		profile = "default"
 		if getCredDuration() != 1*time.Hour {
@@ -48,8 +47,8 @@ func TestGetCredDuration(t *testing.T) {
 	})
 
 	t.Run("no-default", func(t *testing.T) {
-		os.Setenv(config.ConfFileEnvVar, testConfFile()+"-nodefault")
-		defer os.Unsetenv(config.ConfFileEnvVar)
+		os.Setenv(config.ConfigFileEnvVar, testConfFile()+"-nodefault")
+		defer os.Unsetenv(config.ConfigFileEnvVar)
 
 		profile = ""
 		if getCredDuration() != CredDurationDefault {
@@ -59,8 +58,8 @@ func TestGetCredDuration(t *testing.T) {
 	})
 
 	t.Run("other-profile", func(t *testing.T) {
-		os.Setenv(config.ConfFileEnvVar, testConfFile())
-		defer os.Unsetenv(config.ConfFileEnvVar)
+		os.Setenv(config.ConfigFileEnvVar, testConfFile())
+		defer os.Unsetenv(config.ConfigFileEnvVar)
 
 		profile = "other"
 		if getCredDuration() != 8*time.Hour {
@@ -70,8 +69,8 @@ func TestGetCredDuration(t *testing.T) {
 	})
 
 	t.Run("missing-prop", func(t *testing.T) {
-		os.Setenv(config.ConfFileEnvVar, testConfFile())
-		defer os.Unsetenv(config.ConfFileEnvVar)
+		os.Setenv(config.ConfigFileEnvVar, testConfFile())
+		defer os.Unsetenv(config.ConfigFileEnvVar)
 
 		profile = "no-prop"
 		if getCredDuration() != CredDurationDefault {
@@ -81,8 +80,8 @@ func TestGetCredDuration(t *testing.T) {
 	})
 
 	t.Run("bad-prop", func(t *testing.T) {
-		os.Setenv(config.ConfFileEnvVar, testConfFile())
-		defer os.Unsetenv(config.ConfFileEnvVar)
+		os.Setenv(config.ConfigFileEnvVar, testConfFile())
+		defer os.Unsetenv(config.ConfigFileEnvVar)
 
 		profile = "bad-value"
 		if getCredDuration() != CredDurationDefault {
@@ -94,8 +93,8 @@ func TestGetCredDuration(t *testing.T) {
 
 func TestCredExpired(t *testing.T) {
 	t.Run("file-missing", func(t *testing.T) {
-		os.Setenv(config.ConfFileEnvVar, "bad")
-		defer os.Unsetenv(config.ConfFileEnvVar)
+		os.Setenv(config.ConfigFileEnvVar, "bad")
+		defer os.Unsetenv(config.ConfigFileEnvVar)
 		profile = ""
 
 		if !credExpired() {
@@ -105,9 +104,9 @@ func TestCredExpired(t *testing.T) {
 	})
 
 	t.Run("invalid-value", func(t *testing.T) {
-		os.Setenv(config.ConfFileEnvVar, testConfFile())
-		defer os.Unsetenv(config.ConfFileEnvVar)
-		profile = aws_config.DefaultProfileName
+		os.Setenv(config.ConfigFileEnvVar, testConfFile())
+		defer os.Unsetenv(config.ConfigFileEnvVar)
+		profile = config.DefaultProfileName
 
 		f := expFile()
 		if err := ioutil.WriteFile(f, []byte("abc123"), 0600); err != nil {
@@ -122,9 +121,9 @@ func TestCredExpired(t *testing.T) {
 	})
 
 	t.Run("expired", func(t *testing.T) {
-		os.Setenv(config.ConfFileEnvVar, testConfFile())
-		defer os.Unsetenv(config.ConfFileEnvVar)
-		profile = aws_config.DefaultProfileName
+		os.Setenv(config.ConfigFileEnvVar, testConfFile())
+		defer os.Unsetenv(config.ConfigFileEnvVar)
+		profile = config.DefaultProfileName
 
 		exp := time.Now().Add(-24 * time.Hour).Unix()
 		f := expFile()
@@ -140,9 +139,9 @@ func TestCredExpired(t *testing.T) {
 	})
 
 	t.Run("valid", func(t *testing.T) {
-		os.Setenv(config.ConfFileEnvVar, testConfFile())
-		defer os.Unsetenv(config.ConfFileEnvVar)
-		profile = aws_config.DefaultProfileName
+		os.Setenv(config.ConfigFileEnvVar, testConfFile())
+		defer os.Unsetenv(config.ConfigFileEnvVar)
+		profile = config.DefaultProfileName
 
 		exp := time.Now().Add(-30 * time.Minute).Unix()
 		f := expFile()

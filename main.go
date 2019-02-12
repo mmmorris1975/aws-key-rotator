@@ -7,9 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/defaults"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/iam"
-	"github.com/mmmorris1975/aws-config"
 	"github.com/mmmorris1975/aws-config/config"
-	"github.com/mmmorris1975/aws-config/credentials"
 	"github.com/mmmorris1975/simple-logger"
 	"io/ioutil"
 	"os"
@@ -47,7 +45,7 @@ func main() {
 		log.SetLevel(simple_logger.DEBUG)
 	}
 
-	profile = aws_config.ResolveProfile(nil)
+	profile = config.ResolveProfile(nil)
 
 	if credExpired() {
 		log.Printf("!!! IT'S TIME TO ROTATE THE AWS KEYS FOR PROFILE: %s !!!", profile)
@@ -78,7 +76,7 @@ func credExpired() bool {
 func getCredDuration() time.Duration {
 	duration := CredDurationDefault
 
-	cfg, err := config.Load(nil)
+	cfg, err := config.NewAwsConfigFile(nil)
 	if err != nil {
 		log.Warnf("error loading confg file: %v, using default credential duration (%s)", err, CredDurationDefault.String())
 		return duration
@@ -127,7 +125,7 @@ func rotateAccessKeys() error {
 	}
 	log.Debugf("KEYS: %+v", *keys)
 
-	creds, err := credentials.Load(nil)
+	creds, err := config.NewAwsCredentialsFile(nil)
 	if err != nil {
 		return err
 	}
