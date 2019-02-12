@@ -18,12 +18,13 @@ import (
 )
 
 const (
-	CredDurationConfigKey = "aws_api_key_duration"
-	CredDurationDefault   = time.Duration(12) * time.Hour
-	CredTimeFilePrefix    = ".aws_credentials_expiration"
+	credDurationConfigKey = "aws_api_key_duration"
+	credDurationDefault   = time.Duration(12) * time.Hour
+	credTimeFilePrefix    = ".aws_credentials_expiration"
 )
 
 var (
+	// Version of the program
 	Version  string
 	profile  string
 	verbose  bool
@@ -81,26 +82,26 @@ func credExpired() bool {
 }
 
 func getCredDuration() time.Duration {
-	duration := CredDurationDefault
+	duration := credDurationDefault
 
 	cfg, err := config.NewAwsConfigFile(nil)
 	if err != nil {
-		log.Warnf("error loading confg file: %v, using default credential duration (%s)", err, CredDurationDefault.String())
+		log.Warnf("error loading confg file: %v, using default credential duration (%s)", err, credDurationDefault.String())
 		return duration
 	}
 
 	p, err := cfg.Profile(profile)
 	if err != nil {
-		log.Warnf("profile not found, returning default credential duration (%s)", CredDurationDefault.String())
+		log.Warnf("profile not found, returning default credential duration (%s)", credDurationDefault.String())
 		return duration
 	}
 	log.Debugf("PROFILE: %v", p.KeysHash())
 
-	if k, err := p.GetKey(CredDurationConfigKey); err == nil {
+	if k, err := p.GetKey(credDurationConfigKey); err == nil {
 		duration, err = time.ParseDuration(k.Value())
 		if err != nil {
-			log.Warnf("invalid duration, returning default credential duration (%s)", CredDurationDefault.String())
-			return CredDurationDefault
+			log.Warnf("invalid duration, returning default credential duration (%s)", credDurationDefault.String())
+			return credDurationDefault
 		}
 	} else {
 		log.Warnf("error getting credential duration property: %v", err)
@@ -216,5 +217,5 @@ func fetchAccessKeys() (*iam.AccessKey, error) {
 
 func expFile() string {
 	confDir := filepath.Dir(defaults.SharedConfigFilename())
-	return filepath.Join(confDir, fmt.Sprintf("%s_%s", CredTimeFilePrefix, profile))
+	return filepath.Join(confDir, fmt.Sprintf("%s_%s", credTimeFilePrefix, profile))
 }

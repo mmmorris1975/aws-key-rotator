@@ -18,7 +18,7 @@ func TestGetCredDuration(t *testing.T) {
 		defer os.Unsetenv(config.ConfigFileEnvVar)
 
 		profile = "p"
-		if getCredDuration() != CredDurationDefault {
+		if getCredDuration() != credDurationDefault {
 			t.Error("credential duration mismatch")
 			return
 		}
@@ -51,7 +51,7 @@ func TestGetCredDuration(t *testing.T) {
 		defer os.Unsetenv(config.ConfigFileEnvVar)
 
 		profile = ""
-		if getCredDuration() != CredDurationDefault {
+		if getCredDuration() != credDurationDefault {
 			t.Error("credential duration mismatch")
 			return
 		}
@@ -73,7 +73,7 @@ func TestGetCredDuration(t *testing.T) {
 		defer os.Unsetenv(config.ConfigFileEnvVar)
 
 		profile = "no-prop"
-		if getCredDuration() != CredDurationDefault {
+		if getCredDuration() != credDurationDefault {
 			t.Error("credential duration mismatch")
 			return
 		}
@@ -84,7 +84,7 @@ func TestGetCredDuration(t *testing.T) {
 		defer os.Unsetenv(config.ConfigFileEnvVar)
 
 		profile = "bad-value"
-		if getCredDuration() != CredDurationDefault {
+		if getCredDuration() != credDurationDefault {
 			t.Error("credential duration mismatch")
 			return
 		}
@@ -163,14 +163,14 @@ func TestExpFile(t *testing.T) {
 	t.Run("no-conf", func(t *testing.T) {
 		profile = ""
 
-		if expFile() != filepath.Join(confDir, CredTimeFilePrefix+"_") {
+		if expFile() != filepath.Join(confDir, credTimeFilePrefix+"_") {
 			t.Error("expiration file does not match default")
 		}
 	})
 
 	t.Run("path", func(t *testing.T) {
 		profile = "test1"
-		r := filepath.Join(confDir, fmt.Sprintf("%s_%s", CredTimeFilePrefix, profile))
+		r := filepath.Join(confDir, fmt.Sprintf("%s_%s", credTimeFilePrefix, profile))
 
 		if expFile() != r {
 			t.Errorf("expiration file name mismatch (WANT: %s, GOT: %s)", expFile(), r)
