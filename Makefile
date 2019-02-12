@@ -9,9 +9,9 @@ $(EXE): go.mod go.sum *.go
 release: $(EXE) darwin windows linux
 
 darwin linux:
-	GOOS=$@ go build -ldflags '-X main.Version=$(VER)' -o $(EXE)-$(VER)-$@
+	GOOS=$@ go build -ldflags '-X main.Version=$(VER)' -o $(EXE)-$(VER)-$@-amd64
 windows:
-	GOOS=$@ go build -ldflags '-X main.Version=$(VER)' -o $(EXE)-$(VER)-$@.exe
+	GOOS=$@ go build -ldflags '-X main.Version=$(VER)' -o $(EXE)-$(VER)-$@-amd64.exe
 
 clean:
 	rm -f $(EXE) $(EXE)-*-*
