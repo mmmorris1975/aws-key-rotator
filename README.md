@@ -66,7 +66,7 @@ aws_access_key_id = AKIA......
 aws_secret_access_key = .........
 ```
 
-#### Bash specific steps:
+##### Bash specific steps:
   1. Configure Bash PROMPT_COMMAND by editing $HOME/.bashrc and adding this snippet at the end of the file
 ```
 function do_prompt_command {
@@ -79,7 +79,7 @@ PROMPT_COMMAND=do_prompt_command
     2. Re-source $HOME/.bashrc to enable the PROMPT_COMMAND logic (`source ~/.bashrc`)
 </i>
 
-#### ZSH specific steps:
+##### ZSH specific steps:
     1. Configure ZSH PROMPT_COMMAND by editing $HOME/.zprofile and adding this snippet at the end of the file
 ```
 function do_prompt_command {
