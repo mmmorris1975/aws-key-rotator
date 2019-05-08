@@ -52,7 +52,7 @@ other than the SDK default of `$HOME/.aws/config`.
 The location of the credentials file may be over-ridden by setting the `AWS_SHARED_CREDENTIALS_FILE` environment variable, if that file
 exists in a location other than the SDK default of `$HOME/.aws/credentials`
 
-### Example for Bash Shell auto-rotation of the [default] credentials on a non-default interval
+### Example for Shell auto-rotation of the [default] credentials on a non-default interval
   1. Edit .aws/config to set the interval
 ```
 [default]
@@ -64,6 +64,8 @@ aws_api_key_duration = 6h
 [default]
 aws_access_key_id = AKIA......
 aws_secret_access_key = .........
+
+Steps for Bash:
 ```
   3. Configure Bash PROMPT_COMMAND by editing $HOME/.bashrc and adding this snippet at the end of the file
 ```
@@ -75,6 +77,20 @@ function do_prompt_command {
 PROMPT_COMMAND=do_prompt_command
 ```
   4. Re-source $HOME/.bashrc to enable the PROMPT_COMMAND logic (`source ~/.bashrc`)
+
+
+Steps for ZSH:
+  3. Configure ZSH PROMPT_COMMAND by editing $HOME/.zprofile and adding this snippet at the end of the file
+```
+function do_prompt_command {
+  # Add any commands want executed each time before the PS1 prompt is displayed here
+  aws-key-rotator
+}
+
+precmd() { eval do_prompt_command }
+```
+  4. Re-source $HOME/.zprofile to enable the PROMPT_COMMAND logic (`source ~/.zprofile`)
+
 
 ## Building
 
