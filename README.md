@@ -67,7 +67,8 @@ aws_secret_access_key = .........
 ```
 
 #### Bash specific steps:
-   a. Configure Bash PROMPT_COMMAND by editing $HOME/.bashrc and adding this snippet at the end of the file
+<i>
+a. Configure Bash PROMPT_COMMAND by editing $HOME/.bashrc and adding this snippet at the end of the file
 ```
 function do_prompt_command {
   # Add any commands want executed each time before the PS1 prompt is displayed here
@@ -76,7 +77,8 @@ function do_prompt_command {
 
 PROMPT_COMMAND=do_prompt_command
 ```
-   b. Re-source $HOME/.bashrc to enable the PROMPT_COMMAND logic (`source ~/.bashrc`)
+b. Re-source $HOME/.bashrc to enable the PROMPT_COMMAND logic (`source ~/.bashrc`)
+<\i>
 
 #### ZSH specific steps:
    a. Configure ZSH PROMPT_COMMAND by editing $HOME/.zprofile and adding this snippet at the end of the file
