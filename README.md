@@ -64,9 +64,10 @@ aws_api_key_duration = 6h
 [default]
 aws_access_key_id = AKIA......
 aws_secret_access_key = .........
-
-Steps for Bash:
 ```
+
+*Steps for Bash:*
+
   3. Configure Bash PROMPT_COMMAND by editing $HOME/.bashrc and adding this snippet at the end of the file
 ```
 function do_prompt_command {
@@ -79,7 +80,7 @@ PROMPT_COMMAND=do_prompt_command
   4. Re-source $HOME/.bashrc to enable the PROMPT_COMMAND logic (`source ~/.bashrc`)
 
 
-Steps for ZSH:
+*Steps for ZSH:*
   3. Configure ZSH PROMPT_COMMAND by editing $HOME/.zprofile and adding this snippet at the end of the file
 ```
 function do_prompt_command {
