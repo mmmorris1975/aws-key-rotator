@@ -78,7 +78,7 @@ function do_prompt_command {
 PROMPT_COMMAND=do_prompt_command
 ```
 b. Re-source $HOME/.bashrc to enable the PROMPT_COMMAND logic (`source ~/.bashrc`)
-<\i>
+</i>
 
 #### ZSH specific steps:
    a. Configure ZSH PROMPT_COMMAND by editing $HOME/.zprofile and adding this snippet at the end of the file
