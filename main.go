@@ -31,6 +31,7 @@ var (
 	delCreds bool
 	version  bool
 	log      *simple_logger.Logger
+	lockFile *AtomicFile
 )
 
 func init() {
@@ -55,11 +56,27 @@ func main() {
 
 	profile = config.ResolveProfile(nil)
 
+	var err error
+	lockFile, err = NewAtomicFile(fmt.Sprintf("%s.lock", expFile()))
+	if err != nil {
+		log.Fatal("unable to open lock file, can not update keys")
+	}
+
+	defer func() {
+		if err := os.Remove(lockFile.Name()); err != nil {
+			log.Debugf("error removing lock file: %v", err)
+		}
+	}()
+
 	if credExpired() {
 		log.Printf("!!! IT'S TIME TO ROTATE THE AWS KEYS FOR PROFILE: %s !!!", profile)
 		err := rotateAccessKeys()
 		if err != nil {
 			log.Fatal(err)
+		}
+
+		if err := os.Rename(lockFile.Name(), expFile()); err != nil {
+			log.Warnf("error renaming lock file: %v", err)
 		}
 	}
 }
@@ -112,20 +129,11 @@ func getCredDuration() time.Duration {
 }
 
 func rotateAccessKeys() error {
-	// While not the best possible solution, this should allow us to ensure only one process is attempting to update
-	// the expiration file at a time.  If the "lock file" (the scratch file for writing the updated expiration time)
-	// exists, then just do nothing and return.  The 'defer' function should help ensure the file update happens
-	// regardless of how we leave this function after successfully opening the lock file
-	f, err := openLockFile(fmt.Sprintf("%s.lock", expFile()))
-	if err != nil {
-		log.Warn("unable to open lock file, can not update keys")
-		return nil
-	}
-
-	defer func(f *os.File, dest string) {
-		f.Close()
-		os.Rename(f.Name(), dest)
-	}(f, expFile())
+	defer func() {
+		if err := lockFile.Close(); err != nil {
+			log.Debugf("error closing lock file: %v", err)
+		}
+	}()
 
 	keys, err := fetchAccessKeys()
 	if err != nil {
@@ -146,20 +154,11 @@ func rotateAccessKeys() error {
 		return err
 	}
 
-	if _, err = f.WriteString(fmt.Sprintf("%d", (*keys).CreateDate.Unix())); err != nil {
+	if _, err = lockFile.WriteString(fmt.Sprintf("%d", (*keys).CreateDate.Unix())); err != nil {
 		return err
 	}
 
 	return nil
-}
-
-func openLockFile(file string) (*os.File, error) {
-	f, err := os.OpenFile(file, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0600)
-	if err != nil {
-		return nil, err
-	}
-
-	return f, nil
 }
 
 func fetchAccessKeys() (*iam.AccessKey, error) {

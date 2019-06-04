@@ -178,9 +178,9 @@ func TestExpFile(t *testing.T) {
 	})
 }
 
-func TestOpenLockFile(t *testing.T) {
+func TestNewAtomicFileFile(t *testing.T) {
 	t.Run("good", func(t *testing.T) {
-		lf, err := openLockFile(filepath.Join(os.TempDir(), "good"))
+		lf, err := NewAtomicFile(filepath.Join(os.TempDir(), "good"))
 		if err != nil {
 			t.Error(err)
 			return
@@ -190,7 +190,7 @@ func TestOpenLockFile(t *testing.T) {
 	})
 
 	t.Run("multi-open", func(t *testing.T) {
-		lf, err := openLockFile(filepath.Join(os.TempDir(), "multi-open"))
+		lf, err := NewAtomicFile(filepath.Join(os.TempDir(), "multi-open"))
 		if err != nil {
 			t.Error(err)
 			return
@@ -198,7 +198,7 @@ func TestOpenLockFile(t *testing.T) {
 		defer lf.Close()
 		defer os.Remove(lf.Name())
 
-		if _, err := openLockFile(lf.Name()); err == nil {
+		if _, err := NewAtomicFile(lf.Name()); err == nil {
 			t.Error("did not receive expected error when opening existing lock file")
 			return
 		}
