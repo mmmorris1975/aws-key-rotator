@@ -93,12 +93,12 @@ precmd() { eval do_prompt_command }
 ## Building
 
 Developed and tested using the go 1.11 tool chain, aws-sdk-go v1.16.23, and ini v1.39.2  
-*NOTE* This project uses the (currently) experimental `dep` dependency manager.  See https://github.com/golang/dep for details.
+*NOTE* This project uses [go modules](https://github.com/golang/go/wiki/Modules) for dependency management
 
-Assuming you have a go workspace, and GOPATH environment variable set (https://golang.org/doc/code.html#Organization):
-  1. Run `go get -d github.com/mmmorris1975/aws-key-rotator`
-  2. Run `dep ensure` to check/retrieve dependencies
-  3. Then run `go build github.com/mmmorris1975/aws-key-rotator` to create the executable `aws-key-rotator` in the `$GOPATH/bin` directory
+### Build Steps
+
+A Makefile is included with the source code, and executing the default target via the `make` command should install all dependent
+libraries and make the executable for your platform (or platform of choice if the GOOS and GOARCH env vars are set)
 
 ## Contributing
 
