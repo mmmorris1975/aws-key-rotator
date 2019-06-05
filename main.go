@@ -61,6 +61,7 @@ func main() {
 	if err != nil {
 		if os.IsExist(err) {
 			log.Debug("lock file exists, another instance of this program may be updating keys")
+			os.Exit(0)
 		} else {
 			log.Fatalf("unable to open lock file, can not update keys: %v", err)
 		}
