@@ -59,12 +59,18 @@ func main() {
 	var err error
 	lockFile, err = NewAtomicFile(fmt.Sprintf("%s.lock", expFile()))
 	if err != nil {
-		log.Fatal("unable to open lock file, can not update keys")
+		if os.IsExist(err) {
+			log.Debug("lock file exists, another instance of this program may be updating keys")
+		} else {
+			log.Fatalf("unable to open lock file, can not update keys: %v", err)
+		}
 	}
 
 	defer func() {
 		if err := os.Remove(lockFile.Name()); err != nil {
-			log.Debugf("error removing lock file: %v", err)
+			if !os.IsNotExist(err) {
+				log.Debugf("error removing lock file: %v", err)
+			}
 		}
 	}()
 
