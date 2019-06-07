@@ -32,12 +32,14 @@ var (
 	version  bool
 	log      *simple_logger.Logger
 	lockFile *AtomicFile
+	force    bool
 )
 
 func init() {
 	flag.BoolVar(&verbose, "verbose", false, "print verbose messages")
 	flag.BoolVar(&delCreds, "delete", false, "delete credentials instead of inactivating")
 	flag.BoolVar(&version, "version", false, "display program version")
+	flag.BoolVar(&force, "force", false, "force credential rotation")
 
 	log = simple_logger.StdLogger
 	log.SetLevel(simple_logger.INFO)
@@ -75,7 +77,7 @@ func main() {
 		}
 	}()
 
-	if credExpired() {
+	if force || credExpired() {
 		log.Printf("!!! IT'S TIME TO ROTATE THE AWS KEYS FOR PROFILE: %s !!!", profile)
 		err := rotateAccessKeys()
 		if err != nil {
