@@ -1,8 +1,11 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/defaults"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -12,6 +15,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -30,9 +34,10 @@ var (
 	verbose  bool
 	delCreds bool
 	version  bool
+	force    bool
 	log      *simple_logger.Logger
 	lockFile *AtomicFile
-	force    bool
+	sess     *session.Session
 )
 
 func init() {
@@ -56,9 +61,30 @@ func main() {
 		log.SetLevel(simple_logger.DEBUG)
 	}
 
-	profile = config.ResolveProfile(nil)
-
 	var err error
+	c, err := checkInput()
+	if err != nil {
+		log.Debugf("error checking input for credentials, will try SDK credentials file: %v", err)
+	}
+
+	if c != nil {
+		sess = session.Must(session.NewSession(new(aws.Config).WithCredentials(c)))
+		k, err := fetchAccessKeys()
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Debugf("%+v", k)
+		fmt.Printf("%s %s\n", *k.AccessKeyId, *k.SecretAccessKey)
+		os.Exit(0)
+	}
+
+	profile = config.ResolveProfile(nil)
+	sess = session.Must(session.NewSessionWithOptions(session.Options{
+		SharedConfigState:       session.SharedConfigEnable,
+		Profile:                 profile,
+		AssumeRoleTokenProvider: stscreds.StdinTokenProvider,
+	}))
+
 	lockFile, err = NewAtomicFile(fmt.Sprintf("%s.lock", expFile()))
 	if err != nil {
 		if os.IsExist(err) {
@@ -88,6 +114,53 @@ func main() {
 			log.Warnf("error renaming lock file: %v", err)
 		}
 	}
+}
+
+// Check stdin, or command-line args if stdin is empty, for data which may be a set of AWS credentials.
+// We're not doing a lot of "smart" checking for this input, if the data matches a regular expression for
+// 20+ word characters, followed by a single non-word character, then followed by 40+ non-whitespace
+// characters, the single non-word character is considered a separator, and the value on the left will be
+// used as the AWS Access Key, and the value on the right will be the Secret Key.
+func checkInput() (*credentials.Credentials, error) {
+	var in string
+
+	// check stdin (need a timout/context so we don't wait forever)
+	ctx, cancel := context.WithTimeout(context.Background(), 25*time.Millisecond)
+	defer cancel()
+
+	ch := make(chan string, 1)
+	go readStdin(ch)
+
+	select {
+	case <-ctx.Done():
+		log.Debug("read from stdin timed out")
+	case s := <-ch:
+		in = s
+	}
+
+	// if nothing from stdin, try cmdline input
+	if len(in) < 1 {
+		in = strings.Join(flag.Args(), " ")
+	}
+
+	re := regexp.MustCompile(`^\s*(\w{20,})\W(\S{40,})`)
+	matches := re.FindStringSubmatch(in)
+	if len(matches) < 3 {
+		return nil, fmt.Errorf("not enough input to be AWS credentials")
+	}
+
+	return credentials.NewStaticCredentials(matches[1], matches[2], ""), nil
+}
+
+func readStdin(ch chan string) {
+	defer close(ch)
+
+	b, err := ioutil.ReadAll(os.Stdin)
+	if err != nil {
+		log.Debugf("error reading from stdin: %v", err)
+		return
+	}
+	ch <- string(b)
 }
 
 func credExpired() bool {
@@ -172,11 +245,6 @@ func rotateAccessKeys() error {
 
 func fetchAccessKeys() (*iam.AccessKey, error) {
 	input := iam.ListAccessKeysInput{}
-	sess := session.Must(session.NewSessionWithOptions(session.Options{
-		SharedConfigState:       session.SharedConfigEnable,
-		Profile:                 profile,
-		AssumeRoleTokenProvider: stscreds.StdinTokenProvider,
-	}))
 
 	svc := iam.New(sess)
 	truncated := true
