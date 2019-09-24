@@ -95,10 +95,8 @@ func main() {
 		}
 	}
 
-	if force || credExpired() {
-		if err := rotate(); err != nil {
-			os.Exit(1)
-		}
+	if err := rotate(); err != nil {
+		os.Exit(1)
 	}
 }
 
@@ -112,17 +110,19 @@ func rotate() error {
 		}
 	}()
 
-	log.Printf("!!! IT'S TIME TO ROTATE THE AWS KEYS FOR PROFILE: %s !!!", profile)
-	err := rotateAccessKeys()
-	if err != nil {
-		log.Error(err)
-		return err
-	}
+	if force || credExpired() {
+		log.Printf("!!! IT'S TIME TO ROTATE THE AWS KEYS FOR PROFILE: %s !!!", profile)
+		err := rotateAccessKeys()
+		if err != nil {
+			log.Error(err)
+			return err
+		}
 
-	log.Debug("renaming lock file")
-	if err := os.Rename(lockFile.Name(), expFile()); err != nil {
-		log.Warnf("error renaming lock file: %v", err)
-		return err
+		log.Debug("renaming lock file")
+		if err := os.Rename(lockFile.Name(), expFile()); err != nil {
+			log.Warnf("error renaming lock file: %v", err)
+			return err
+		}
 	}
 
 	return nil
