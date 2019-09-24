@@ -117,7 +117,7 @@ precmd() { eval do_prompt_command }
 
 ## Building
 
-Developed and tested using the go 1.11 tool chain, aws-sdk-go v1.16.23, and ini v1.39.2  
+Developed and tested using the go 1.12 tool chain, aws-sdk-go v1.24.5, and ini v1.48.0  
 *NOTE* This project uses [go modules](https://github.com/golang/go/wiki/Modules) for dependency management
 
 ### Build Steps
