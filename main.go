@@ -102,7 +102,11 @@ func main() {
 
 func rotate() error {
 	defer func() {
-		log.Debug("removing lock file")
+		log.Debug("clearing lock file")
+		if err := lockFile.Close(); err != nil {
+			log.Debugf("error closing lock file: %v", err)
+		}
+
 		if err := os.Remove(lockFile.Name()); err != nil {
 			if !os.IsNotExist(err) {
 				log.Debugf("error removing lock file: %v", err)
@@ -223,13 +227,6 @@ func getCredDuration() time.Duration {
 }
 
 func rotateAccessKeys() error {
-	defer func() {
-		log.Debug("closing lock file")
-		if err := lockFile.Close(); err != nil {
-			log.Debugf("error closing lock file: %v", err)
-		}
-	}()
-
 	keys, err := fetchAccessKeys()
 	if err != nil {
 		return err
