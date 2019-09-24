@@ -95,7 +95,16 @@ func main() {
 		}
 	}
 
+	if force || credExpired() {
+		if err := rotate(); err != nil {
+			os.Exit(1)
+		}
+	}
+}
+
+func rotate() error {
 	defer func() {
+		log.Debug("removing lock file")
 		if err := os.Remove(lockFile.Name()); err != nil {
 			if !os.IsNotExist(err) {
 				log.Debugf("error removing lock file: %v", err)
@@ -103,17 +112,20 @@ func main() {
 		}
 	}()
 
-	if force || credExpired() {
-		log.Printf("!!! IT'S TIME TO ROTATE THE AWS KEYS FOR PROFILE: %s !!!", profile)
-		err := rotateAccessKeys()
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		if err := os.Rename(lockFile.Name(), expFile()); err != nil {
-			log.Warnf("error renaming lock file: %v", err)
-		}
+	log.Printf("!!! IT'S TIME TO ROTATE THE AWS KEYS FOR PROFILE: %s !!!", profile)
+	err := rotateAccessKeys()
+	if err != nil {
+		log.Error(err)
+		return err
 	}
+
+	log.Debug("renaming lock file")
+	if err := os.Rename(lockFile.Name(), expFile()); err != nil {
+		log.Warnf("error renaming lock file: %v", err)
+		return err
+	}
+
+	return nil
 }
 
 // Check stdin, or command-line args if stdin is empty, for data which may be a set of AWS credentials.
@@ -212,6 +224,7 @@ func getCredDuration() time.Duration {
 
 func rotateAccessKeys() error {
 	defer func() {
+		log.Debug("closing lock file")
 		if err := lockFile.Close(); err != nil {
 			log.Debugf("error closing lock file: %v", err)
 		}
